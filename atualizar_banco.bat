@@ -11,17 +11,15 @@ echo.
 echo.
 echo Opcoes:
 echo 1. Atualizar com dados externos (DB2)
-echo 2. Atualizar com dados simulados
-echo 3. Verificar status atual
-echo 4. Sair
+echo 2. Verificar status atual
+echo 3. Sair
 echo.
 
-set /p opcao="Escolha uma opcao (1-4): "
+set /p opcao="Escolha uma opcao (1-3): "
 
 if "%opcao%"=="1" goto externo
-if "%opcao%"=="2" goto simulado
-if "%opcao%"=="3" goto status
-if "%opcao%"=="4" goto sair
+if "%opcao%"=="2" goto status
+if "%opcao%"=="3" goto sair
 echo Opcao invalida! Tente novamente.
 goto menu
 
@@ -37,17 +35,7 @@ echo   git push origin main
 pause
 goto fim
 
-:simulado
-echo.
-echo Atualizando com dados simulados...
-python atualizar_banco_local.py simulado
-echo.
-echo Para atualizar o Streamlit Cloud, execute:
-echo   git add dados_vendas.db
-echo   git commit -m "Atualizar dados simulados"
-echo   git push origin main
-pause
-goto fim
+REM Função de dados simulados removida - apenas dados reais
 
 :status
 echo.

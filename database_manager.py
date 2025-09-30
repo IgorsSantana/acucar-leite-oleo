@@ -171,42 +171,9 @@ class DatabaseManager:
             return None
     
     def gerar_dados_demo(self, dias_analise=21, dias_projecao=15):
-        """Gera dados simulados para demonstração"""
-        dados_demo = []
-        lojas = [1, 2, 3, 4, 5]
-        
-        for loja in lojas:
-            for codigo, categoria in SUBGRUPOS_ALVO.items():
-                # Vendas simuladas (variando por categoria)
-                vendas_base = {
-                    "ÓLEO": 1500,
-                    "AÇÚCAR": 2200, 
-                    "LEITE": 1800
-                }
-                
-                # Adicionar variação aleatória
-                np.random.seed(loja + codigo)  # Para consistência
-                vendas = vendas_base[categoria] + np.random.randint(-300, 500)
-                estoque = vendas + np.random.randint(-200, 300)
-                
-                # Cálculos
-                venda_diaria = vendas / dias_analise
-                projecao = venda_diaria * dias_projecao
-                compra_recomendada = max(0, projecao - estoque)
-                
-                dados_demo.append({
-                    'data_venda': datetime.now().date(),
-                    'id_loja': loja,
-                    'codigo_subgrupo': codigo,
-                    'categoria': categoria,
-                    'quantidade_vendida': vendas,
-                    'estoque_atual': estoque,
-                    'venda_diaria_media': venda_diaria,
-                    'projecao_venda': projecao,
-                    'compra_recomendada': compra_recomendada
-                })
-        
-        return pd.DataFrame(dados_demo)
+        """Função removida - apenas dados reais são permitidos"""
+        print("❌ Dados simulados não são permitidos neste sistema!")
+        return pd.DataFrame()
     
     def atualizar_dados(self, usar_dados_externos=True, dias_analise=21, dias_projecao=15):
         """Atualiza os dados no banco interno"""
@@ -221,10 +188,10 @@ class DatabaseManager:
         if usar_dados_externos:
             print("🌐 Tentando buscar dados do banco externo...")
             df = self.buscar_dados_externos(dias_analise)
-            if df is None:
-                print("⚠️ Falha na conexão externa, usando dados simulados")
-                df = self.gerar_dados_demo(dias_analise, dias_projecao)
-                fonte = "simulados"
+            if df is None or df.empty:
+                print("❌ Falha na conexão externa - apenas dados reais são permitidos!")
+                conn.close()
+                return 0
             else:
                 print("✅ Dados externos obtidos com sucesso!")
                 # Calcular projeções
@@ -240,9 +207,9 @@ class DatabaseManager:
                 })
                 fonte = "externos"
         else:
-            print("Usando dados simulados...")
-            df = self.gerar_dados_demo(dias_analise, dias_projecao)
-            fonte = "simulados"
+            print("❌ Apenas dados reais são permitidos neste sistema!")
+            conn.close()
+            return 0
         
         # Inserir dados no banco
         for _, row in df.iterrows():

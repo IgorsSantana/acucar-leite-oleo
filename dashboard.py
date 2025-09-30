@@ -30,70 +30,37 @@ st.set_page_config(
     layout="wide"
 )
 
-# Função para gerar dados demo
-def gerar_dados_demo(dias_analise, dias_projecao):
-    """Gera dados simulados para demonstração"""
-    dados_demo = []
-    lojas = [1, 2, 3, 4, 5]
-    
-    for loja in lojas:
-        for codigo, categoria in SUBGRUPOS_ALVO.items():
-            vendas_base = {
-                "ÓLEO": 1500,
-                "AÇÚCAR": 2200, 
-                "LEITE": 1800
-            }
-            
-            np.random.seed(loja + codigo)
-            vendas = vendas_base[categoria] + np.random.randint(-300, 500)
-            estoque = vendas + np.random.randint(-200, 300)
-            
-            venda_diaria = vendas / dias_analise
-            projecao = venda_diaria * dias_projecao
-            compra_recomendada = max(0, projecao - estoque)
-            
-            dados_demo.append({
-                'ID_LOJA': loja,
-                'CODIGO_SUBGRUPO': codigo,
-                'CATEGORIA': categoria,
-                'QUANTIDADE_VENDIDA': vendas,
-                'ESTOQUE_ATUAL': estoque,
-                'VENDA_DIARIA_MEDIA': venda_diaria,
-                'PROJECAO_VENDA': projecao,
-                'COMPRA_RECOMENDADA': compra_recomendada
-            })
-    
-    return pd.DataFrame(dados_demo)
+# Função de dados simulados removida - apenas dados reais
 
 @st.cache_data(ttl=300)
 def buscar_dados_relatorio(dias_analise, dias_projecao):
-    """Busca dados do banco interno ou gera dados simulados"""
+    """Busca dados do banco interno (apenas dados reais)"""
     
-    # Se está em deploy (Streamlit Cloud), sempre usar banco interno
+    # Se está em deploy (Streamlit Cloud), usar banco interno
     if EM_DEPLOY and BANCO_INTERNO_DISPONIVEL:
         try:
             df = db_manager.buscar_dados_dashboard(dias_analise, dias_projecao)
             if not df.empty:
                 configs = db_manager.obter_configuracoes()
                 ultima_atualizacao = configs.get('ultima_atualizacao', {}).get('valor', 'N/A')
-                fonte_dados = configs.get('fonte_dados', {}).get('valor', 'simulados')
+                fonte_dados = configs.get('fonte_dados', {}).get('valor', 'externos')
                 
                 if fonte_dados == 'externos':
-                    st.success(f"✅ **Dados atualizados do banco externo** - Última atualização: {ultima_atualizacao[:19]}")
+                    st.success(f"✅ **Dados reais do banco externo** - Última atualização: {ultima_atualizacao[:19]}")
                 else:
-                    st.info(f"🎭 **Dados simulados** - Última atualização: {ultima_atualizacao[:19]}")
+                    st.warning(f"⚠️ **Dados antigos** - Última atualização: {ultima_atualizacao[:19]}")
                 
                 return df
+            else:
+                st.error("❌ **Nenhum dado encontrado** - Execute a atualização no servidor")
+                return pd.DataFrame()
         except Exception as e:
-            st.warning(f"⚠️ Erro no banco interno: {e}")
+            st.error(f"❌ **Erro no banco interno:** {e}")
+            return pd.DataFrame()
     
-    # Fallback para dados simulados
-    if EM_DEPLOY:
-        st.info("🎭 **Dados simulados** - Sistema público")
-    else:
-        st.info("🎭 **Dados simulados** - Sistema offline")
-    
-    return gerar_dados_demo(dias_analise, dias_projecao)
+    # Se não está em deploy, mostrar erro
+    st.error("❌ **Sistema offline** - Este sistema funciona apenas no Streamlit Cloud")
+    return pd.DataFrame()
 
 # Interface principal
 st.markdown('<h1 class="main-header">📊 Análise de Vendas e Compras</h1>', unsafe_allow_html=True)
@@ -125,11 +92,14 @@ with st.sidebar:
     if EM_DEPLOY:
         st.markdown("### ℹ️ Informações do Sistema")
         st.info("""
-        **Sistema Público** - Os dados são atualizados automaticamente do servidor.
+        **Sistema Público** - Dados reais do banco externo.
         
-        Para atualizar os dados externos, execute no servidor:
+        Para atualizar os dados, execute no servidor:
         ```bash
-        python atualizar_dados.py externo
+        python atualizar_banco_local.py externo
+        git add dados_vendas.db
+        git commit -m "Atualizar dados reais"
+        git push origin main
         ```
         """)
     

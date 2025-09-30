@@ -42,33 +42,10 @@ def atualizar_banco_externo():
         return False
 
 def atualizar_banco_simulado():
-    """Atualiza o banco com dados simulados"""
-    print(f"[{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] Atualizando com dados simulados...")
-    
-    try:
-        db = DatabaseManager()
-        registros = db.atualizar_dados(usar_dados_externos=False, dias_analise=21, dias_projecao=15)
-        
-        if registros > 0:
-            print(f"✅ Sucesso! {registros} registros simulados criados")
-            
-            # Salvar log
-            with open("log_atualizacao.txt", "a", encoding="utf-8") as f:
-                f.write(f"{datetime.now().isoformat()} - Dados simulados: {registros} registros\n")
-            
-            print("📤 Agora faça commit e push para atualizar o Streamlit Cloud:")
-            print("   git add dados_vendas.db")
-            print("   git commit -m 'Atualizar dados simulados'")
-            print("   git push origin main")
-            
-            return True
-        else:
-            print("❌ Nenhum registro foi atualizado")
-            return False
-            
-    except Exception as e:
-        print(f"❌ Erro na atualização: {e}")
-        return False
+    """Função removida - apenas dados reais são permitidos"""
+    print("❌ Dados simulados não são permitidos neste sistema!")
+    print("✅ Use apenas dados reais do banco externo.")
+    return False
 
 def verificar_status():
     """Verifica o status atual do banco"""
@@ -122,42 +99,35 @@ def main():
         
         if comando == "externo":
             atualizar_banco_externo()
-        elif comando == "simulado":
-            atualizar_banco_simulado()
         elif comando == "status":
             verificar_status()
         else:
             print("❌ Comando inválido!")
-            print("Comandos disponíveis: externo, simulado, status")
+            print("Comandos disponíveis: externo, status")
     else:
         # Menu interativo
         print("📋 Opções:")
         print("1. Atualizar com dados externos (DB2)")
-        print("2. Atualizar com dados simulados")
-        print("3. Verificar status atual")
-        print("4. Sair")
+        print("2. Verificar status atual")
+        print("3. Sair")
         print()
         
         while True:
             try:
-                opcao = input("Escolha uma opção (1-4): ").strip()
+                opcao = input("Escolha uma opção (1-3): ").strip()
                 
                 if opcao == "1":
                     if atualizar_banco_externo():
                         print("\n🎉 Atualização concluída! Faça commit e push para atualizar o Streamlit Cloud.")
                     break
                 elif opcao == "2":
-                    if atualizar_banco_simulado():
-                        print("\n🎉 Dados simulados atualizados! Faça commit e push para atualizar o Streamlit Cloud.")
-                    break
-                elif opcao == "3":
                     verificar_status()
                     break
-                elif opcao == "4":
+                elif opcao == "3":
                     print("👋 Até logo!")
                     break
                 else:
-                    print("❌ Opção inválida! Escolha 1-4.")
+                    print("❌ Opção inválida! Escolha 1-3.")
                     
             except KeyboardInterrupt:
                 print("\n👋 Operação cancelada pelo usuário.")

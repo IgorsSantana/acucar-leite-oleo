@@ -66,11 +66,8 @@ git push origin main
 ### **Atualização de Dados:**
 
 ```bash
-# Dados do banco externo (DB2)
+# Dados do banco externo (DB2) - ÚNICA OPÇÃO
 python atualizar_banco_local.py externo
-
-# Dados simulados
-python atualizar_banco_local.py simulado
 
 # Verificar status atual
 python atualizar_banco_local.py status
@@ -85,19 +82,14 @@ git commit -m "Atualizar dados - $(date)"
 git push origin main
 ```
 
-## 📋 **Opções de Atualização**
+## 📋 **Atualização de Dados**
 
-### **1. Dados Externos (Recomendado)**
+### **✅ Apenas Dados Reais**
 - ✅ Conecta ao banco DB2
 - ✅ Dados reais de vendas
 - ✅ Atualização completa
 - ⚠️ Requer conexão com o banco
-
-### **2. Dados Simulados**
-- ✅ Funciona offline
-- ✅ Dados de demonstração
-- ✅ Teste rápido
-- ⚠️ Não são dados reais
+- ❌ **Dados simulados não são permitidos**
 
 ## 🔍 **Verificação de Status**
 
@@ -132,13 +124,10 @@ atualizar_banco.bat
 # Fazer commit e push
 ```
 
-### **Cenário 2: Teste Rápido**
+### **Cenário 2: Verificação de Status**
 ```bash
-# Para testar o sistema
-python atualizar_banco_local.py simulado
-git add dados_vendas.db
-git commit -m "Teste com dados simulados"
-git push origin main
+# Para verificar se está tudo OK
+python atualizar_banco_local.py status
 ```
 
 ### **Cenário 3: Verificação**
@@ -169,8 +158,9 @@ git push origin main --force
 
 ### **Problema: Erro de conexão com DB2**
 ```bash
-# Usar dados simulados como fallback
-python atualizar_banco_local.py simulado
+# Verificar conexão com o banco
+# Certifique-se de que o DB2 está acessível
+# Verificar configurações de rede
 ```
 
 ### **Problema: Script não executa**
