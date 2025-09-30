@@ -25,7 +25,7 @@
    - **Main file path**: dashboard.py
    - **App URL**: escolha um nome único
 
-### Passo 3: Configurar Variáveis de Ambiente
+### Passo 3: Configurar Secrets (Opcional)
 No Streamlit Cloud, vá em "Settings" > "Secrets" e adicione:
 
 ```toml
@@ -36,6 +36,8 @@ DB_NAME = "SAB"
 DB_USER = "db2user_ro"
 DB_PASSWORD = "Sup3rs44nt0"
 ```
+
+**⚠️ Nota:** Se não configurar os secrets, o app funcionará em **modo demonstração** com dados simulados.
 
 ### Passo 4: Deploy
 1. Clique em "Deploy!"

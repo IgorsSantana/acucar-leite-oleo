@@ -1,2 +1,0 @@
-# Arquivo necessário para instalar dependências do sistema no Streamlit Cloud
-pyodbc
