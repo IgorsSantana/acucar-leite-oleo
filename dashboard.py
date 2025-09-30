@@ -28,6 +28,15 @@ except ImportError:
         "PWD": "Sup3rs44nt0"
     }
 
+# Importar o gerenciador de banco interno
+try:
+    from database_manager import DatabaseManager
+    db_manager = DatabaseManager()
+    BANCO_INTERNO_DISPONIVEL = True
+except ImportError:
+    BANCO_INTERNO_DISPONIVEL = False
+    print("⚠️ Database manager não disponível, usando modo demonstração")
+
 # --- Configuração da Página do Dashboard ---
 st.set_page_config(
     page_title="📊 Análise Profissional de Vendas - Óleo, Açúcar e Leite",
@@ -224,9 +233,24 @@ def gerar_dados_demo(dias_analise, dias_projecao):
 # --- Caching da Função de Busca de Dados ---
 @st.cache_data(ttl=300)  # Cache por 5 minutos
 def buscar_dados_relatorio(dias_analise, dias_projecao):
-    """Conecta ao DB, executa a query e retorna um DataFrame com os dados."""
+    """Busca dados do banco interno ou gera dados simulados."""
     
-    # Verificar se está em ambiente de deploy (modo demonstração)
+    # Priorizar banco interno se disponível
+    if BANCO_INTERNO_DISPONIVEL:
+        try:
+            df = db_manager.buscar_dados_dashboard(dias_analise, dias_projecao)
+            if not df.empty:
+                # Mostrar informações do banco interno
+                configs = db_manager.obter_configuracoes()
+                ultima_atualizacao = configs.get('ultima_atualizacao', {}).get('valor', 'N/A')
+                fonte_dados = configs.get('fonte_dados', {}).get('valor', 'interno')
+                
+                st.success(f"✅ **Dados do banco interno** - Última atualização: {ultima_atualizacao[:19]}")
+                return df
+        except Exception as e:
+            st.warning(f"⚠️ Erro no banco interno: {e}")
+    
+    # Fallback: verificar se está em ambiente de deploy (modo demonstração)
     if os.getenv("STREAMLIT_SHARING") or os.getenv("RAILWAY_ENVIRONMENT") or os.getenv("RENDER"):
         st.warning("🚧 **Modo Demonstração** - Dados simulados para deploy")
         return gerar_dados_demo(dias_analise, dias_projecao)
@@ -362,6 +386,37 @@ with st.sidebar:
                 st.session_state.metricas = calcular_metricas_avancadas(st.session_state.df_dados)
                 st.session_state.insights = gerar_insights_automaticos(st.session_state.metricas, st.session_state.df_dados)
                 st.success("✅ Dados carregados com sucesso!")
+    
+    # Botão para atualizar dados (se banco interno disponível)
+    if BANCO_INTERNO_DISPONIVEL:
+        st.markdown("---")
+        st.markdown("### 🔄 Atualização de Dados")
+        
+        col1, col2 = st.columns(2)
+        
+        with col1:
+            if st.button("🌐 Atualizar Dados Externos", use_container_width=True):
+                with st.spinner("🔄 Atualizando dados do banco externo..."):
+                    try:
+                        registros = db_manager.atualizar_dados(usar_dados_externos=True, 
+                                                              dias_analise=dias_analise, 
+                                                              dias_projecao=dias_projecao)
+                        st.success(f"✅ Dados atualizados: {registros} registros")
+                        st.rerun()
+                    except Exception as e:
+                        st.error(f"❌ Erro na atualização: {e}")
+        
+        with col2:
+            if st.button("🎭 Atualizar Dados Simulados", use_container_width=True):
+                with st.spinner("🔄 Gerando dados simulados..."):
+                    try:
+                        registros = db_manager.atualizar_dados(usar_dados_externos=False, 
+                                                              dias_analise=dias_analise, 
+                                                              dias_projecao=dias_projecao)
+                        st.success(f"✅ Dados simulados atualizados: {registros} registros")
+                        st.rerun()
+                    except Exception as e:
+                        st.error(f"❌ Erro na atualização: {e}")
     
     # Filtros simples
     if 'df_dados' in st.session_state and not st.session_state.df_dados.empty:
