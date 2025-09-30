@@ -125,6 +125,9 @@ dmypy.json
 # Streamlit
 .streamlit/secrets.toml
 
+# Configurações sensíveis
+config.py
+
 # Logs
 *.log
 log_*.txt

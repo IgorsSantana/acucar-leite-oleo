@@ -12,7 +12,10 @@ import os
 # Configurações com fallback
 try:
     from config import SUBGRUPOS_ALVO, CONFIG_CONEXAO
+    print("✅ Usando configurações do arquivo config.py")
 except ImportError:
+    print("⚠️ Arquivo config.py não encontrado, usando configurações padrão")
+    print("💡 Execute 'python configurar_banco.py' para configurar as credenciais")
     SUBGRUPOS_ALVO = {
         211604: "ÓLEO",
         410204: "LEITE", 

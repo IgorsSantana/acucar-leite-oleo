@@ -6,11 +6,14 @@ import os
 from datetime import datetime, timedelta
 
 # Configurações básicas
-SUBGRUPOS_ALVO = {
-    211604: "ÓLEO",
-    410204: "LEITE", 
-    210604: "AÇÚCAR"
-}
+try:
+    from config import SUBGRUPOS_ALVO
+except ImportError:
+    SUBGRUPOS_ALVO = {
+        211604: "ÓLEO",
+        410204: "LEITE", 
+        210604: "AÇÚCAR"
+    }
 
 # Importar o gerenciador de banco interno
 try:
