@@ -300,6 +300,7 @@ class DatabaseManager:
         df = df.rename(columns={
             'id_loja': 'ID_LOJA',
             'codigo_subgrupo': 'CODIGO_SUBGRUPO',
+            'categoria': 'CATEGORIA',
             'quantidade_vendida': 'QUANTIDADE_VENDIDA',
             'estoque_atual': 'ESTOQUE_ATUAL',
             'venda_diaria_media': 'VENDA_DIARIA_MEDIA',
