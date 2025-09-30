@@ -321,41 +321,4 @@ class DatabaseManager:
         conn.close()
         return configs
 
-def main():
-    """Função principal para atualizar dados"""
-    print("=" * 50)
-    print("🗄️  ATUALIZADOR DE DADOS - DASHBOARD VENDAS")
-    print("=" * 50)
-    
-    db = DatabaseManager()
-    
-    print("\n📋 Opções:")
-    print("1. Atualizar com dados externos (DB2)")
-    print("2. Atualizar com dados simulados")
-    print("3. Apenas verificar dados atuais")
-    
-    opcao = input("\nEscolha uma opção (1-3): ").strip()
-    
-    if opcao == "1":
-        print("\n🌐 Tentando conectar ao banco externo...")
-        db.atualizar_dados(usar_dados_externos=True)
-    elif opcao == "2":
-        print("\nGerando dados simulados...")
-        db.atualizar_dados(usar_dados_externos=False)
-    elif opcao == "3":
-        print("\n📊 Verificando dados atuais...")
-        df = db.buscar_dados_dashboard()
-        print(f"✅ {len(df)} registros encontrados")
-        print("\n📋 Resumo por categoria:")
-        resumo = df.groupby('CATEGORIA').agg({
-            'QUANTIDADE_VENDIDA': 'sum',
-            'COMPRA_RECOMENDADA': 'sum'
-        }).round(0).astype(int)
-        print(resumo)
-    else:
-        print("❌ Opção inválida!")
-    
-    print("\n✅ Processo concluído!")
-
-if __name__ == "__main__":
-    main()
+# Função main removida - usar atualizar_dados.py
