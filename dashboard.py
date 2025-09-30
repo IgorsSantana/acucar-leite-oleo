@@ -20,12 +20,12 @@ except ImportError:
     }
     CONFIG_CONEXAO = {
         "DRIVER": "{IBM DB2 ODBC DRIVER}",
-        "DATABASE": os.getenv("DB_NAME", "SAB"),
-        "HOSTNAME": os.getenv("DB_HOST", "10.64.1.11"),
-        "PORT": os.getenv("DB_PORT", "50000"),
+        "DATABASE": "SAB",
+        "HOSTNAME": "10.64.1.11", 
+        "PORT": "50000",
         "PROTOCOL": "TCPIP",
-        "UID": os.getenv("DB_USER", "db2user_ro"),
-        "PWD": os.getenv("DB_PASSWORD", "Sup3rs44nt0")
+        "UID": "db2user_ro",
+        "PWD": "Sup3rs44nt0"
     }
 
 # --- Configuração da Página do Dashboard ---
@@ -231,14 +231,29 @@ def buscar_dados_relatorio(dias_analise, dias_projecao):
         st.warning("🚧 **Modo Demonstração** - Dados simulados para deploy")
         return gerar_dados_demo(dias_analise, dias_projecao)
     
+    # Tentar usar secrets do Streamlit primeiro
+    try:
+        secrets = st.secrets
+        config = {
+            "DRIVER": secrets.get("DB_DRIVER", CONFIG_CONEXAO['DRIVER']),
+            "DATABASE": secrets.get("DB_NAME", CONFIG_CONEXAO['DATABASE']),
+            "HOSTNAME": secrets.get("DB_HOST", CONFIG_CONEXAO['HOSTNAME']),
+            "PORT": secrets.get("DB_PORT", CONFIG_CONEXAO['PORT']),
+            "PROTOCOL": secrets.get("DB_PROTOCOL", CONFIG_CONEXAO['PROTOCOL']),
+            "UID": secrets.get("DB_USER", CONFIG_CONEXAO['UID']),
+            "PWD": secrets.get("DB_PASSWORD", CONFIG_CONEXAO['PWD'])
+        }
+    except:
+        config = CONFIG_CONEXAO
+    
     connection_string = (
-        f"DRIVER={CONFIG_CONEXAO['DRIVER']};"
-        f"DATABASE={CONFIG_CONEXAO['DATABASE']};"
-        f"HOSTNAME={CONFIG_CONEXAO['HOSTNAME']};"
-        f"PORT={CONFIG_CONEXAO['PORT']};"
-        f"PROTOCOL={CONFIG_CONEXAO['PROTOCOL']};"
-        f"UID={CONFIG_CONEXAO['UID']};"
-        f"PWD={CONFIG_CONEXAO['PWD']};"
+        f"DRIVER={config['DRIVER']};"
+        f"DATABASE={config['DATABASE']};"
+        f"HOSTNAME={config['HOSTNAME']};"
+        f"PORT={config['PORT']};"
+        f"PROTOCOL={config['PROTOCOL']};"
+        f"UID={config['UID']};"
+        f"PWD={config['PWD']};"
     )
 
     try:
